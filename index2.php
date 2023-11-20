@@ -2,16 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dynamic Dropdown</title>
+    <title>DropDown Employee </title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body>
+    <form action="show.php" style="margin: 1em 1em 2em 45em;" method="POST">
     <label for="state">Select State:</label>
     <select id="state" name="state" onchange="getCities()">
         <option value="">Select State</option>
         <?php
             // Fetch states from the database
-            $conn = new mysqli("localhost", "root", "password", "rohit");
+            require "connection.php";
 
             $result = $conn->query("SELECT * FROM states");
 
@@ -42,5 +43,9 @@
             });
         }
     </script>
+
+    <input type="submit" value="submit">
+
+</form>
 </body>
 </html>

@@ -3,7 +3,7 @@
 
 $stateId = $_POST['state_id'];
 
-$conn = new mysqli("localhost", "root", "password", "rohit");
+require "connection.php";
 
 $result = $conn->query("SELECT * FROM cities WHERE state_id = $stateId");
 
