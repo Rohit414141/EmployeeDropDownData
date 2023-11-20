@@ -6,9 +6,9 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body>
-    <form action="show.php" style="margin: 1em 1em 2em 45em;" method="POST">
+    <form action="show.php" style="margin: 1em 1em 2em 23em; font-size:28px;" method="POST">
     <label for="state">Select State:</label>
-    <select id="state" name="state" onchange="getCities()">
+    <select id="state" name="state" style="font-size: 18px;" onchange="getCities()">
         <option value="">Select State</option>
         <?php
             // Fetch states from the database
@@ -25,7 +25,7 @@
     </select>
 
     <label for="city">Select City:</label>
-    <select id="city" name="city">
+    <select id="city" name="city" style="font-size: 18px;">
         <option value="">Select City</option>
     </select>
 
@@ -44,7 +44,7 @@
         }
     </script>
 
-    <input type="submit" value="submit">
+    <input type="submit" value="submit" style="font-size: 18px;">
 
 </form>
 </body>
