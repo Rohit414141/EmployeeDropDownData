@@ -35,5 +35,3 @@ $conn->close();
 require "index2.php";
 
 ?>
-
-

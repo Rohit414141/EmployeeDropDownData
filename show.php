@@ -29,79 +29,72 @@ if ($result->num_rows > 0) {
 
 } else {
     echo "No employees found in the selected state and city.";
-
-?>
     
+?>
+    <a href="index.php" style="margin-left:65em;">Home Page</a>
 <?php
 }
 ?>
-
 <!-- hichart used  -->
-
 <?php
+// Query to get salary and gender information
+$query = "SELECT gender, SUM(salary) as total_salary FROM Emp WHERE state_id = '$selectedState' AND city_id = '$selectedCity' GROUP BY gender";
+$result = $conn->query($query);
 
-$sql = "SELECT gender, AVG(salary) as avg_salary FROM Emp WHERE state_id = '$selectedState' AND city_id = '$selectedCity' GROUP BY gender";
-$result = $conn->query($sql);
-
+// Fetch data and format for chart
 $data = array();
 while ($row = $result->fetch_assoc()) {
     $data[] = $row;
 }
-
 $conn->close();
 ?>
 
-<?php
-$chartData = array();
-
-foreach ($data as $row) {
-    $chartData[] = array(
-        'gender' => $row['gender'],
-        'avg_salary' => floatval($row['avg_salary'])
-    );
-}
-
-$chartDataJson = json_encode($chartData);
-?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Gender vs Salary Chart</title>
-    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <title>Salary and Gender Chart</title>
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        #myChart{
+
+            width: 700px !important;
+            height: 700px !important;
+            margin-left: 10em;
+            font-size: px;;
+        }
+    </style>
 </head>
 <body>
+    <h2>Salary and Gender Chart</h2>
+    <canvas id="myChart" width="0" height="0"></canvas>
 
-<div id="container" style="width: 50%; height: 400px;"></div>
+    <script>
+        // Prepare data for the chart
+        var data = <?php echo json_encode($data); ?>;
+        
+       // Extract labels and values
+        var labels = data.map(function(item) {
+            return item.gender;
+        });
+        var values = data.map(function(item) {
+            return item.total_salary;
+        });
 
-<script>
-    var chartData = <?php echo $chartDataJson; ?>;
-
-    Highcharts.chart('container', {
-        chart: {
-            type: 'bar'
-        },
-        title: {
-            text: 'Gender vs Salary'
-        },
-        xAxis: {
-            categories: chartData.map(function (item) {
-                return item.gender;
-            })
-        },
-        yAxis: {
-            title: {
-                text: 'Average Salary'
-            }
-        },
-        series: [{
-            name: 'Average Salary',
-            data: chartData.map(function (item) {
-                return item.avg_salary;
-            })
-        }]
-    });
-</script>
+        // Create a pie chart
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: ['blue', 'pink'], // Adjust colors as needed
+                }],
+            },
+        });
+    </script>
 
 </body>
 </html>
