@@ -34,7 +34,7 @@ if ($result->num_rows > 0) {
 
 // Fetch data from the database
 
-$sql = "SELECT salary, gender, state, city FROM Emp";
+$sql = "SELECT name,salary, gender, state, city FROM Emp";
 $result = $conn->query($sql);
 
 $data = [];
@@ -42,7 +42,6 @@ while ($row = $result->fetch_assoc()) {
     $data[] = $row;
 }
 
-$conn->close();
 ?>
 
 <!-- hychart -->
@@ -55,21 +54,16 @@ $conn->close();
     <title>Salary, Gender, State, and City Distribution</title>
     <!-- Include Highcharts library -->
     <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    
 
     <style>
-        #highcharts-gender-salary{
-            margin-left: 5em !important;
-        }
-
         #highcharts-state-city{
-            margin: 7em -10em 1em -9em !important;
+            margin-left: 13em !important;
         }
     </style>
 </head>
 <body>
-
-<!-- Highcharts Pie Chart for Gender and Salary -->
-<div id="highcharts-gender-salary" style="width: 50%; display: inline-block;"></div>
 
 <!-- Highcharts Pie Chart for State and City -->
 <div id="highcharts-state-city" style="width: 50%; display: inline-block;"></div>
@@ -80,13 +74,6 @@ $conn->close();
     var stateCityData = {};
 
     <?php foreach ($data as $row): ?>
-        // Gender and Salary Data
-        var gender = "<?php echo $row['gender']; ?>";
-        var salary = parseFloat("<?php echo $row['salary']; ?>");
-        if (!genderSalaryData[gender]) {
-            genderSalaryData[gender] = 0;
-        }
-        genderSalaryData[gender] += salary;
 
         // State and City Data
         var state = "<?php echo $row['state']; ?>";
@@ -97,22 +84,6 @@ $conn->close();
         }
         stateCityData[stateCityKey]++;
     <?php endforeach; ?>
-
-    // Highcharts Pie Chart for Gender and Salary
-    Highcharts.chart('highcharts-gender-salary', {
-        chart: {
-            type: 'pie',
-        },
-        title: {
-            text: 'Gender and Salary Ration'
-        },
-        series: [{
-            data: Object.entries(genderSalaryData).map(([gender, totalSalary]) => ({
-                name: gender,
-                y: totalSalary
-            }))
-        }]
-    });
 
     // Highcharts Pie Chart for State and City
     Highcharts.chart('highcharts-state-city', {
@@ -131,5 +102,106 @@ $conn->close();
     });
 </script>
 
+<!-- name salary gender graph show -->
+
+<div id="bar-graph"></div>
+
+<script>
+    // Prepare data for Plotly
+    var names = <?php echo json_encode(array_column($data, 'name')); ?>;
+    var salaries = <?php echo json_encode(array_column($data, 'salary')); ?>;
+    var genders = <?php echo json_encode(array_column($data, 'gender')); ?>;
+
+    // Group data by gender
+    var groupedData = {};
+    for (var i = 0; i < names.length; i++) {
+        var gender = genders[i];
+        if (!groupedData[gender]) {
+            groupedData[gender] = [];
+        }
+        groupedData[gender].push({name: names[i], salary: salaries[i]});
+    }
+
+    // Create traces for each gender
+    var traces = [];
+    for (var gender in groupedData) {
+        var trace = {
+            x: groupedData[gender].map(item => item.name),
+            y: groupedData[gender].map(item => item.salary),
+            type: 'bar',
+            name: gender,
+        };
+        traces.push(trace);
+    }
+
+    // Layout
+    var layout = {
+        barmode: 'group',
+        title: 'Salary and Gender Bio Graph',
+        xaxis: {
+            title: 'Employee Name'
+        },
+        yaxis: {
+            title: 'Salary'
+        }
+    };
+
+    // Plot the graph
+    Plotly.newPlot('bar-graph', traces, layout);
+</script>
+
+<!-- state graph show total budget -->
+
+<?php
+// Fetch data from the database
+
+$sql_budget = "SELECT state, SUM(salary) as total_salary FROM Emp GROUP BY state";
+$result_budget = $conn->query($sql_budget);
+
+$data_budget = [];
+while ($row_budget = $result_budget->fetch_assoc()) {
+    $data_budget[] = $row_budget;
+}
+
+
+$conn->close();
+?>
+
+<div id="salary-chart" style="width: 80%; height: 400px;"></div>
+
+<script>
+    // Prepare data for Plotly
+    var states = <?php echo json_encode(array_column($data_budget, 'state')); ?>;
+    var totalSalaries = <?php echo json_encode(array_column($data_budget, 'total_salary')); ?>;
+
+    // Create a trace for the bar chart
+    var trace = {
+        x: states,
+        y: totalSalaries,
+        type: 'bar',
+        marker: {
+            color: 'rgb(51, 122, 183)',
+        },
+    };
+
+    // Layout
+    var layout = {
+        title: 'Total Salary by State',
+        xaxis: {
+            title: 'State'
+        },
+        yaxis: {
+            title: 'Total Salary'
+        }
+    };
+
+    // Plot the chart
+    Plotly.newPlot('salary-chart', [trace], layout);
+</script>
+
 </body>
 </html>
+
+
+
+
