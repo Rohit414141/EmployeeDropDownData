@@ -155,15 +155,13 @@ while ($row = $result->fetch_assoc()) {
 <?php
 // Fetch data from the database
 
-$sql_budget = "SELECT state, SUM(salary) as total_salary FROM Emp GROUP BY state";
+$sql_budget = "SELECT state, SUM(salary) as total_salary FROM Emp  GROUP BY state";
 $result_budget = $conn->query($sql_budget);
 
 $data_budget = [];
 while ($row_budget = $result_budget->fetch_assoc()) {
     $data_budget[] = $row_budget;
 }
-
-
 $conn->close();
 ?>
 
