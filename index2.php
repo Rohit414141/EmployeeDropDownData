@@ -6,13 +6,13 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body>
-    <form action="" style="margin: 1em 1em 2em 23em; font-size:28px;" method="POST">
+    <form action="" style="margin: 1em 1em 4em 21em; font-size:28px;" method="POST">
     <label for="state">Select State:</label>
     <select id="state" name="state" style="font-size: 18px;" onchange="getCities()">
         <option value="">Select State</option>
         <?php
             // Fetch states from the database
-            require "connection.php";
+            // require "connection.php";
 
             $result = $conn->query("SELECT * FROM states");
 
@@ -20,7 +20,7 @@
                 echo "<option value='{$row['id']}'>{$row['state_name']}</option>";
             }
 
-            $conn->close();
+            // $conn->close();
         ?>
     </select>
 
@@ -44,7 +44,7 @@
         }
     </script>
 
-    <input type="submit" value="Show Selected Emp" style="font-size: 18px;">
+    <input type="submit" value="Show Selected Emp" style="font-size: 14px;">
 
 </form>
 </body>

@@ -9,27 +9,67 @@ $selectedCity = $_POST['city'];
 
 $query = "select id,name,email,gender,salary,contact,state,city from Emp  WHERE state_id = '$selectedState' AND city_id = '$selectedCity'";
 $result = $conn->query($query);
-
-// Display the results
 ?>
-<h1 style="margin-left: 20em;">Which State and City Employee Belongs to</h1>
-<?php
-if ($result->num_rows > 0) {
-    echo "<table border='2' style='font-size: 38px; margin-left: 11em '><tr><th>Id</th><th>Name</th><th>Email</th><th>Gender</th><th>Salary</th><th>Contact</th><th>state</th><th>City</th></tr>";
-    while ($row = $result->fetch_assoc()) {
-        echo "<tr><td>" . $row["id"] . "</td><td>" . $row["name"] . "</td><td>" . $row["email"] . "</td><td>". $row["gender"] . "</td><td>" . $row["salary"]."</td><td>" . $row["contact"]."</td><td>". $row["state"] . "</td><td>" . $row["city"] . "</td></tr>";
-    }
-    echo "</table>";
-?>    
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap Table Example</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 60px; /* Adjust the top padding if using a fixed navbar */
+        }
+        .container-fluid{
+            margin-top: -82px;
+        
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <h1 class="mt-4" style="text-align: center;">State City Wise Emp Record</h1>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Contact</th>
+            <th>Salary</th>
+            <th>State</th>
+            <th>City</th>
+            <!-- Add more columns as needed -->
+        </tr>
+        </thead>
+        <tbody>
+        <?php
+        // Loop through the fetched data and display it in the table
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                echo "<tr>";
+                echo "<td>" . $row["id"] . "</td>";
+                echo "<td>" . $row["name"] . "</td>";
+                echo "<td>" . $row["email"] . "</td>";
+                echo "<td>" . $row["contact"]. "</td>";
+                echo "<td>" . $row["salary"]. "</td>";
+                echo "<td>" . $row["state"]. "</td>";
+                echo "<td>" . $row["city"]. "</td>";
+                // Add more columns as needed
+                echo "</tr>";
+            }
+        } else {
+            echo "<tr><td colspan='3'>No records found</td></tr>";
+        }
+        ?>
+        </tbody>
+    </table>
+</div>
  
-<?php
-
-} else {
-    echo "No employees found in the selected state and city.";
-    
-}
-?>
-<!-- high chart -->    
 <?php
 
 // Fetch data from the database
@@ -64,43 +104,6 @@ while ($row = $result->fetch_assoc()) {
     </style>
 </head>
 <body>
-
-<!-- Highcharts Pie Chart for State and City -->
-<div id="highcharts-state-city" style="width: 50%; display: inline-block;"></div>
-
-<script>
-    // Prepare data for Highcharts
-    var genderSalaryData = {};
-    var stateCityData = {};
-
-    <?php foreach ($data as $row): ?>
-
-        // State and City Data
-        var state = "<?php echo $row['state']; ?>";
-        var city = "<?php echo $row['city']; ?>";
-        var stateCityKey = state + ' - ' + city;
-        if (!stateCityData[stateCityKey]) {
-            stateCityData[stateCityKey] = 0;
-        }
-        stateCityData[stateCityKey]++;
-    <?php endforeach; ?>
-
-    // Highcharts Pie Chart for State and City
-    Highcharts.chart('highcharts-state-city', {
-        chart: {
-            type: 'pie',
-        },
-        title: {
-            text: 'State and City Ratio'
-        },
-        series: [{
-            data: Object.entries(stateCityData).map(([stateCity, count]) => ({
-                name: stateCity,
-                y: count
-            }))
-        }]
-    });
-</script>
 
 <!-- name salary gender graph show -->
 
@@ -150,28 +153,28 @@ while ($row = $result->fetch_assoc()) {
     Plotly.newPlot('bar-graph', traces, layout);
 </script>
 
-<!-- state graph show total budget -->
-
 <?php
 // Fetch data from the database
 
-$sql_budget = "SELECT state, SUM(salary) as total_salary FROM Emp  GROUP BY state";
+$sql_budget = "SELECT state, Avg(salary) as total_salary FROM Emp GROUP BY state";
 $result_budget = $conn->query($sql_budget);
 
 $data_budget = [];
 while ($row_budget = $result_budget->fetch_assoc()) {
     $data_budget[] = $row_budget;
 }
-$conn->close();
+
+// $conn->close();
 ?>
 
-<div id="salary-chart" style="width: 80%; height: 400px;"></div>
+<div id="bar-chart" style="width: 100%; height: 400px;"></div>
 
 <script>
     // Prepare data for Plotly
     var states = <?php echo json_encode(array_column($data_budget, 'state')); ?>;
-    var totalSalaries = <?php echo json_encode(array_column($data_budget, 'total_salary')); ?>;
 
+    var totalSalaries = <?php echo json_encode(array_column($data_budget, 'total_salary')); ?>;
+    
     // Create a trace for the bar chart
     var trace = {
         x: states,
@@ -186,7 +189,7 @@ $conn->close();
     var layout = {
         title: 'Total Salary by State',
         xaxis: {
-            title: 'State'
+            title: 'State Name'
         },
         yaxis: {
             title: 'Total Salary'
@@ -194,8 +197,48 @@ $conn->close();
     };
 
     // Plot the chart
-    Plotly.newPlot('salary-chart', [trace], layout);
+    Plotly.newPlot('bar-chart', [trace], layout);
+  
 </script>
+
+
+<!-- Highcharts Pie Chart for State and City -->
+<div id="highcharts-state-city" style="width: 50%; display: inline-block;"></div>
+
+<script>
+    // Prepare data for Highcharts
+    var genderSalaryData = {};
+    var stateCityData = {};
+
+    <?php foreach ($data as $row): ?>
+
+        // State and City Data
+        var state = "<?php echo $row['state']; ?>";
+        var city = "<?php echo $row['city']; ?>";
+        var stateCityKey = state + ' - ' + city;
+        if (!stateCityData[stateCityKey]) {
+            stateCityData[stateCityKey] = 0;
+        }
+        stateCityData[stateCityKey]++;
+    <?php endforeach; ?>
+
+    // Highcharts Pie Chart for State and City
+    Highcharts.chart('highcharts-state-city', {
+        chart: {
+            type: 'pie',
+        },
+        title: {
+            text: 'State and City Ratio'
+        },
+        series: [{
+            data: Object.entries(stateCityData).map(([stateCity, count]) => ({
+                name: stateCity,
+                y: count
+            }))
+        }]
+    });
+</script>
+
 
 </body>
 </html>

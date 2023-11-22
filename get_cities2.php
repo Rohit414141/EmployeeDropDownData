@@ -13,5 +13,5 @@ while ($row = $result->fetch_assoc()) {
     echo "<option value='{$row['id']}'>{$row['city_name']}</option>";
 }
 
-$conn->close();
+// $conn->close();
 ?>
