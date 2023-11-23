@@ -99,7 +99,7 @@ while ($row = $result->fetch_assoc()) {
 
     <style>
         #highcharts-state-city{
-            margin-left: 13em !important;
+            margin-left: 1em !important;
         }
     </style>
 </head>
